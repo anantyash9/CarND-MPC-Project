@@ -98,8 +98,52 @@ int main() {
           * Both are in between [-1, 1].
           *
           */
-          double steer_value;
-          double throttle_value;
+
+          //Preprocessing 
+          size_t n_waypoints = ptsx.size();
+          for (int i = 0; i < ptsx.size(); i++ ) 
+          {
+            double shift_x = ptsx[i] - px;
+            double shift_y = ptsy[i] - py;
+
+            ptsx[i] = shift_x * cos(0-psi) - shift_y * sin(0-psi);
+            ptsy[i] = shift_x * sin(0-psi) + shift_y * cos(0-psi);
+          }
+          double* ptrx =&ptsx[0];
+          Eigen::Map<Eigen::VectorXd> ptsx_transform (ptrx,6);
+
+          double* ptry =&ptsy[0];
+          Eigen::Map<Eigen::VectorXd> ptsx_transform (ptry,6);
+
+          auto coeffs = polyfit(ptsx_transform, ptsy_transform, 3);
+
+          // Delay in milliseconds
+          int Delay =  100;
+
+
+          // Initial state of the vehicle.
+          double x0 = 0;
+          double y0 = 0;
+          double psi0 = 0;
+          double cte0 = coeffs[0];
+          double epsi0 = -atan(coeffs[1]);
+
+          // Predicted state of the vehicle after delay.
+          double xD = x0 + ( v * cos(psi0) * (Delay/1000.0) );
+          double yD = y0 + ( v * sin(psi0) * (Delay/1000.0) );
+          double psiD = psi0 - ( v * delta * (Delay/1000.0) / mpc.Lf );
+          double vD= v + a * (Delay/1000.0);
+          double cteD = cte0 + ( v * sin(epsi0) * (Delay/1000.0) );
+          double epsiD = epsi0 - ( v * atan(coeffs[1]) * (Delay/1000.0) / mpc.Lf );
+
+          // Make the state vector
+          Eigen::VectorXd state(6);
+          state_vector << xD, yD, psiD, vD, cteD, epsiD;
+
+          auto vars = mpc.Solve(state_vector, coeffs);
+
+          double steer_value = vars[0]/deg2rad(25);
+          double throttle_value = vars[1];
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
@@ -139,7 +183,7 @@ int main() {
           //
           // NOTE: REMEMBER TO SET THIS TO 100 MILLISECONDS BEFORE
           // SUBMITTING.
-          this_thread::sleep_for(chrono::milliseconds(100));
+          this_thread::sleep_for(chrono::milliseconds(Delay));
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {
