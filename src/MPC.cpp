@@ -138,7 +138,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
 
   size_t n_constraints = N * 6;
   size_t n_vars = N * 6 + (N - 1) * 2;
-  
+
 
   // Initial value of the independent variables.
   // SHOULD BE 0 besides initial state.
@@ -237,7 +237,7 @@ for ( int i = 0; i < delta_start; i++ ) {
   result.push_back(solution.x[delta_start]);
   result.push_back(solution.x[a_start]);
 
-  for ( int i = 0; i < N - 1; i++ ) {
+  for ( int i = 0; i < N - 2; i++ ) {
     result.push_back(solution.x[x_start + i + 1]);
     result.push_back(solution.x[y_start + i + 1]);
   }
