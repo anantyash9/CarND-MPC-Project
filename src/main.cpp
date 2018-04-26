@@ -91,6 +91,8 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
+          double s_angle= j[1]["steering_angle"];
+          double throttle = j[1]["throttle"];
 
           /*
           * TODO: Calculate steering angle and throttle using MPC.
@@ -100,7 +102,6 @@ int main() {
           */
 
           //Preprocessing 
-          size_t n_waypoints = ptsx.size();
           for (int i = 0; i < ptsx.size(); i++ ) 
           {
             double shift_x = ptsx[i] - px;
@@ -113,7 +114,7 @@ int main() {
           Eigen::Map<Eigen::VectorXd> ptsx_transform (ptrx,6);
 
           double* ptry =&ptsy[0];
-          Eigen::Map<Eigen::VectorXd> ptsx_transform (ptry,6);
+          Eigen::Map<Eigen::VectorXd> ptsy_transform (ptry,6);
 
           auto coeffs = polyfit(ptsx_transform, ptsy_transform, 3);
 
@@ -131,13 +132,13 @@ int main() {
           // Predicted state of the vehicle after delay.
           double xD = x0 + ( v * cos(psi0) * (Delay/1000.0) );
           double yD = y0 + ( v * sin(psi0) * (Delay/1000.0) );
-          double psiD = psi0 - ( v * delta * (Delay/1000.0) / mpc.Lf );
-          double vD= v + a * (Delay/1000.0);
+          double psiD = psi0 - ( v * s_angle * (Delay/1000.0) / 2.67);
+          double vD= v + throttle * (Delay/1000.0);
           double cteD = cte0 + ( v * sin(epsi0) * (Delay/1000.0) );
-          double epsiD = epsi0 - ( v * atan(coeffs[1]) * (Delay/1000.0) / mpc.Lf );
+          double epsiD = epsi0 - ( v * atan(coeffs[1]) * (Delay/1000.0) / 2.67 );
 
           // Make the state vector
-          Eigen::VectorXd state(6);
+          Eigen::VectorXd state_vector(6);
           state_vector << xD, yD, psiD, vD, cteD, epsiD;
 
           auto vars = mpc.Solve(state_vector, coeffs);
