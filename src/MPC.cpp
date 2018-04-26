@@ -22,7 +22,7 @@ double dt = 0.1;
 const double Lf = 2.67;
 const double ref_cte = 0;
 const double ref_epsi = 0;
-const double ref_v = 100;
+const double ref_v = 60;
 
 const size_t x_start = 0;
 const size_t y_start = x_start + N;
@@ -48,19 +48,19 @@ class FG_eval {
         fg[0] = 0;
 
     for( unsigned int i = 0; i < N; i++ ) {
-      fg[0] += 2000*CppAD::pow(vars[cte_start + i] - ref_cte, 2);
-      fg[0] += 2000*CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
+      fg[0] += 2000*CppAD::pow(vars[cte_start + i], 2);
+      fg[0] += 2000*CppAD::pow(vars[epsi_start + i], 2);
       fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
     }
 
     for (unsigned int i = 0; i< N - 1; i++) {
-      fg[0] += 50*CppAD::pow(vars[delta_start + i], 2);
-      fg[0] += 50*CppAD::pow(vars[a_start + i], 2);
+      fg[0] += 5*CppAD::pow(vars[delta_start + i], 2);
+      fg[0] += 5*CppAD::pow(vars[a_start + i], 2);
     }
 
     for (unsigned int i = 0; i < N - 2; i++) {
-      fg[0] += 2000*CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
-      fg[0] += 1000*CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
+      fg[0] += 500*CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
+      fg[0] += 100*CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
     }
     // index 0 is cost so we bump up all index by 1
     fg[1 + x_start] = vars[x_start];
@@ -70,7 +70,7 @@ class FG_eval {
     fg[1 + cte_start] = vars[cte_start];
     fg[1 + epsi_start] = vars[epsi_start];
 
-for (int i = 0; i < N - 1; i++) {
+for (unsigned int i = 0; i < N - 1; i++) {
 
 
       AD<double> x0 = vars[x_start + i];
@@ -143,7 +143,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // Initial value of the independent variables.
   // SHOULD BE 0 besides initial state.
   Dvector vars(n_vars);
-  for (int i = 0; i < n_vars; i++) {
+  for (unsigned int i = 0; i < n_vars; i++) {
     vars[i] = 0;
   }
 
