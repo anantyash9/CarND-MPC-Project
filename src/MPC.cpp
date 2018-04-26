@@ -47,18 +47,18 @@ class FG_eval {
     // the Solver function below.
         fg[0] = 0;
 
-    for( int i = 0; i < N; i++ ) {
+    for( unsigned int i = 0; i < N; i++ ) {
       fg[0] += 2000*CppAD::pow(vars[cte_start + i] - ref_cte, 2);
       fg[0] += 2000*CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
       fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
     }
 
-    for (int i = 0; i< N - 1; i++) {
+    for (unsigned int i = 0; i< N - 1; i++) {
       fg[0] += 5*CppAD::pow(vars[delta_start + i], 2);
       fg[0] += 5*CppAD::pow(vars[a_start + i], 2);
     }
 
-    for (int i = 0; i < N - 2; i++) {
+    for (unsigned int i = 0; i < N - 2; i++) {
       fg[0] += 200*CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
       fg[0] += 10*CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
     }
@@ -70,7 +70,7 @@ class FG_eval {
     fg[1 + cte_start] = vars[cte_start];
     fg[1 + epsi_start] = vars[epsi_start];
 
-    for (int i = 1; i < N - 1; i++) {
+    for (unsigned int i = 1; i < N - 1; i++) {
 
       AD<double> x1 = vars[x_start + i + 1];
       AD<double> y1 = vars[y_start + i + 1];
@@ -122,23 +122,24 @@ MPC::~MPC() {}
 
 vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   bool ok = true;
+  // size_t i;
   typedef CPPAD_TESTVECTOR(double) Dvector;
-  double x = state[0];
-  double y = state[1];
-  double psi = state[2];
-  double v = state[3];
-  double cte = state[4];
-  double epsi = state[5];
 
-  // TODO: Set the number of model variables (includes both states and inputs).
+  const double x = state[0];
+  const double y = state[1];
+  const double psi = state[2];
+  const double v = state[3];
+  const double cte = state[4];
+  const double epsi = state[5];
+
+  // Set the number of model variables (includes both states and inputs).
   // For example: If the state is a 4 element vector, the actuators is a 2
   // element vector and there are 10 timesteps. The number of variables is:
   //
   // 4 * 10 + 2 * 9
-
-  size_t n_constraints = N * 6;
-  size_t n_vars = N * 6 + (N - 1) * 2;
-
+  const size_t n_vars = N * 6 + (N - 1) * 2;
+  // Set the number of constraints
+  const size_t n_constraints = N * 6;
 
   // Initial value of the independent variables.
   // SHOULD BE 0 besides initial state.
@@ -149,9 +150,12 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
 
   Dvector vars_lowerbound(n_vars);
   Dvector vars_upperbound(n_vars);
-
   // TODO: Set lower and upper limits for variables.
-for ( int i = 0; i < delta_start; i++ ) {
+  // Set the initial variable values
+
+  // Set all non-actuators upper and lower limits
+  // to the max negative and positive values.
+  for ( int i = 0; i < delta_start; i++ ) {
     vars_lowerbound[i] = -1.0e19;
     vars_upperbound[i] = 1.0e19;
   }
@@ -177,6 +181,7 @@ for ( int i = 0; i < delta_start; i++ ) {
     constraints_lowerbound[i] = 0;
     constraints_upperbound[i] = 0;
   }
+
   constraints_lowerbound[x_start] = x;
   constraints_lowerbound[y_start] = y;
   constraints_lowerbound[psi_start] = psi;
@@ -237,7 +242,7 @@ for ( int i = 0; i < delta_start; i++ ) {
   result.push_back(solution.x[delta_start]);
   result.push_back(solution.x[a_start]);
 
-  for ( int i = 0; i < N - 2; i++ ) {
+  for ( unsigned int i = 0; i < N - 2; i++ ) {
     result.push_back(solution.x[x_start + i + 1]);
     result.push_back(solution.x[y_start + i + 1]);
   }
