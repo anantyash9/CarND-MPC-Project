@@ -22,7 +22,7 @@ double dt = 0.1;
 const double Lf = 2.67;
 const double ref_cte = 0;
 const double ref_epsi = 0;
-const double ref_v = 60;
+const double ref_v = 80;
 
 const size_t x_start = 0;
 const size_t y_start = x_start + N;
@@ -48,19 +48,19 @@ class FG_eval {
         fg[0] = 0;
 
     for( unsigned int i = 0; i < N; i++ ) {
-      fg[0] += 2000*CppAD::pow(vars[cte_start + i], 2);
-      fg[0] += 2000*CppAD::pow(vars[epsi_start + i], 2);
+      fg[0] += 120*CppAD::pow(vars[cte_start + i], 2);
+      fg[0] += 120*CppAD::pow(vars[epsi_start + i], 2);
       fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
     }
 
     for (unsigned int i = 0; i< N - 1; i++) {
-      fg[0] += 5*CppAD::pow(vars[delta_start + i], 2);
-      fg[0] += 5*CppAD::pow(vars[a_start + i], 2);
+      fg[0] += 6*CppAD::pow(vars[delta_start + i], 2);
+      fg[0] += 6*CppAD::pow(vars[a_start + i], 2);
     }
 
     for (unsigned int i = 0; i < N - 2; i++) {
-      fg[0] += 500*CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
-      fg[0] += 100*CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
+      fg[0] += 12000*CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
+      fg[0] += 1200*CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
     }
     // index 0 is cost so we bump up all index by 1
     fg[1 + x_start] = vars[x_start];
