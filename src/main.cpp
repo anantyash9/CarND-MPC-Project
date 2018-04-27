@@ -156,7 +156,7 @@ int main() {
           vector<double> mpc_x_vals;
           vector<double> mpc_y_vals;
 
-          for ( int i = 2; i < vars.size(); i++ ) {
+          for ( unsigned int i = 2; i < vars.size(); i++ ) {
             if ( i % 2 == 0 ) 
             {
               mpc_x_vals.push_back( vars[i] );

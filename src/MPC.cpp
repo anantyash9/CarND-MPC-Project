@@ -48,19 +48,19 @@ class FG_eval {
         fg[0] = 0;
 
     for( unsigned int i = 0; i < N; i++ ) {
-      fg[0] += 120*CppAD::pow(vars[cte_start + i], 2);
-      fg[0] += 120*CppAD::pow(vars[epsi_start + i], 2);
+      fg[0] += 1200*CppAD::pow(vars[cte_start + i], 2);
+      fg[0] += 1200*CppAD::pow(vars[epsi_start + i], 2);
       fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
     }
 
     for (unsigned int i = 0; i< N - 1; i++) {
-      fg[0] += 6*CppAD::pow(vars[delta_start + i], 2);
-      fg[0] += 6*CppAD::pow(vars[a_start + i], 2);
+      fg[0] += 60*CppAD::pow(vars[delta_start + i], 2);
+      fg[0] += 60*CppAD::pow(vars[a_start + i], 2);
     }
 
     for (unsigned int i = 0; i < N - 2; i++) {
-      fg[0] += 12000*CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
-      fg[0] += 1200*CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
+      fg[0] += 242000*CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
+      fg[0] += 6000*CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
     }
     // index 0 is cost so we bump up all index by 1
     fg[1 + x_start] = vars[x_start];
