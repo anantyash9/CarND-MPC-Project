@@ -237,7 +237,7 @@ for ( unsigned int i = 0; i < delta_start; i++ ) {
   result.push_back(solution.x[delta_start]);
   result.push_back(solution.x[a_start]);
 
-  for ( unsigned int i = 0; i < N - 2; i++ ) {
+  for ( unsigned int i = 0; i < N - 1; i++ ) {
     result.push_back(solution.x[x_start + i + 1]);
     result.push_back(solution.x[y_start + i + 1]);
   }
